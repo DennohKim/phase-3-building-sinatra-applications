@@ -12,6 +12,12 @@ end
 
 desc "Start the server"
 task :server do
-  exec "rerun -b 'rackup config.ru'"
+  if ActiveRecord::Base.connection.migration_context.needs_migration?
+    puts "Migrations are pending. Make sure to run `rake db:migrate` first."
+    return
+  end
+
+  #allows autoreloading of server when files get updated.
+  exec "bundle exec rerun -b 'rackup config.ru'"
 end
 
